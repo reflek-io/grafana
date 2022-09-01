@@ -34,12 +34,16 @@ func (a *AccessControl) Evaluate(ctx context.Context, user *user.SignedInUser, e
 	defer timer.ObserveDuration()
 	metrics.MAccessEvaluationCount.Inc()
 
+	if !verifyPermissionsSet(user) {
+		user.Permissions = make(map[int64]map[string][]string)
+	}
+
 	if !verifyPermissions(user) {
 		permissions, err := a.service.GetUserPermissions(ctx, user, accesscontrol.Options{ReloadCache: true})
 		if err != nil {
 			return false, err
 		}
-		user.Permissions = map[int64]map[string][]string{user.OrgID: accesscontrol.GroupScopesByAction(permissions)}
+		user.Permissions[user.OrgID] = accesscontrol.GroupScopesByAction(permissions)
 	}
 
 	// Test evaluation without scope resolver first, this will prevent 403 for wildcard scopes when resource does not exist
@@ -103,8 +107,12 @@ func (a *AccessControl) IsDisabled() bool {
 	return accesscontrol.IsDisabled(a.cfg)
 }
 
+func verifyPermissionsSet(u *user.SignedInUser) bool {
+	return u.Permissions != nil
+}
+
 func verifyPermissions(u *user.SignedInUser) bool {
-	if u.Permissions == nil {
+	if !verifyPermissionsSet(u) {
 		return false
 	}
 	if _, ok := u.Permissions[u.OrgID]; !ok {
