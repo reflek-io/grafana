@@ -70,7 +70,7 @@
       {
         "body": ["onError", "onLoad"],
         "iframe": ["onError", "onLoad"],
-        "img": ["onError", "onLoad"],
+        "img": ["onError", "onLoad"]
       }
     ],
     "jsx-a11y/no-noninteractive-element-to-interactive-role": "warn",
