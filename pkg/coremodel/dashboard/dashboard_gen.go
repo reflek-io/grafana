@@ -88,6 +88,17 @@ const (
 	HeatmapPanelTypeHeatmap HeatmapPanelType = "heatmap"
 )
 
+// Defines values for DashboardMappingType.
+const (
+	MappingTypeRange MappingType = "range"
+
+	MappingTypeRegex MappingType = "regex"
+
+	MappingTypeSpecial MappingType = "special"
+
+	MappingTypeValue MappingType = "value"
+)
+
 // Defines values for DashboardPanelRepeatDirection.
 const (
 	PanelRepeatDirectionH PanelRepeatDirection = "h"
@@ -95,9 +106,39 @@ const (
 	PanelRepeatDirectionV PanelRepeatDirection = "v"
 )
 
+// Defines values for DashboardRangeMapType.
+const (
+	RangeMapTypeRange RangeMapType = "range"
+)
+
+// Defines values for DashboardRegexMapType.
+const (
+	RegexMapTypeRegex RegexMapType = "regex"
+)
+
 // Defines values for DashboardRowPanelType.
 const (
 	RowPanelTypeRow RowPanelType = "row"
+)
+
+// Defines values for DashboardSpecialValueMapType.
+const (
+	SpecialValueMapTypeSpecial SpecialValueMapType = "special"
+)
+
+// Defines values for DashboardSpecialValueMatch.
+const (
+	SpecialValueMatchEmpty SpecialValueMatch = "empty"
+
+	SpecialValueMatchFalse SpecialValueMatch = "false"
+
+	SpecialValueMatchNan SpecialValueMatch = "nan"
+
+	SpecialValueMatchNull SpecialValueMatch = "null"
+
+	SpecialValueMatchNullNan SpecialValueMatch = "null+nan"
+
+	SpecialValueMatchTrue SpecialValueMatch = "true"
 )
 
 // Defines values for DashboardThresholdsConfigMode.
@@ -112,6 +153,11 @@ const (
 	ThresholdsModeAbsolute ThresholdsMode = "absolute"
 
 	ThresholdsModePercentage ThresholdsMode = "percentage"
+)
+
+// Defines values for DashboardValueMapType.
+const (
+	ValueMapTypeValue ValueMapType = "value"
 )
 
 // Defines values for DashboardVariableModelType.
@@ -334,6 +380,15 @@ type DashboardLink struct {
 // Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
 type DashboardLinkType string
 
+// DashboardDynamicConfigValue defines model for dashboard.DynamicConfigValue.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type DynamicConfigValue struct {
+	Id    string       `json:"id"`
+	Value *interface{} `json:"value,omitempty"`
+}
+
 // TODO docs
 //
 // THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
@@ -360,6 +415,126 @@ type FieldColorModeId string
 // THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
 // Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
 type FieldColorSeriesByMode string
+
+// DashboardFieldConfig defines model for dashboard.FieldConfig.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type FieldConfig struct {
+	// TODO docs
+	Color *FieldColor `json:"color,omitempty"`
+
+	// custom is specified by the PanelFieldConfig field
+	// in panel plugin schemas.
+	Custom *map[string]interface{} `json:"custom,omitempty"`
+
+	// Significant digits (for display)
+	Decimals *float32 `json:"decimals,omitempty"`
+
+	// Human readable field metadata
+	Description *string `json:"description,omitempty"`
+
+	// The display value for this field.  This supports template variables blank is auto
+	DisplayName *string `json:"displayName,omitempty"`
+
+	// This can be used by data sources that return and explicit naming structure for values and labels
+	// When this property is configured, this value is used rather than the default naming strategy.
+	DisplayNameFromDS *string `json:"displayNameFromDS,omitempty"`
+
+	// True if data source field supports ad-hoc filters
+	Filterable *bool `json:"filterable,omitempty"`
+
+	// // The behavior when clicking on a result
+	Links *[]interface{} `json:"links,omitempty"`
+
+	// Convert input values into a display string
+	Mappings *[]ValueMapping `json:"mappings,omitempty"`
+	Max      *float32        `json:"max,omitempty"`
+	Min      *float32        `json:"min,omitempty"`
+
+	// Alternative to empty string
+	NoValue *string `json:"noValue,omitempty"`
+
+	// An explict path to the field in the datasource.  When the frame meta includes a path,
+	// This will default to `${frame.meta.path}/${field.name}
+	//
+	// When defined, this value can be used as an identifier within the datasource scope, and
+	// may be used to update the results
+	Path       *string           `json:"path,omitempty"`
+	Thresholds *ThresholdsConfig `json:"thresholds,omitempty"`
+
+	// Numeric Options
+	Unit *string `json:"unit,omitempty"`
+
+	// True if data source can write a value to the path.  Auth/authz are supported separately
+	Writeable *bool `json:"writeable,omitempty"`
+}
+
+// DashboardFieldConfigSource defines model for dashboard.FieldConfigSource.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type FieldConfigSource struct {
+	Defaults struct {
+		// TODO docs
+		Color *FieldColor `json:"color,omitempty"`
+
+		// custom is specified by the PanelFieldConfig field
+		// in panel plugin schemas.
+		Custom *map[string]interface{} `json:"custom,omitempty"`
+
+		// Significant digits (for display)
+		Decimals *float32 `json:"decimals,omitempty"`
+
+		// Human readable field metadata
+		Description *string `json:"description,omitempty"`
+
+		// The display value for this field.  This supports template variables blank is auto
+		DisplayName *string `json:"displayName,omitempty"`
+
+		// This can be used by data sources that return and explicit naming structure for values and labels
+		// When this property is configured, this value is used rather than the default naming strategy.
+		DisplayNameFromDS *string `json:"displayNameFromDS,omitempty"`
+
+		// True if data source field supports ad-hoc filters
+		Filterable *bool `json:"filterable,omitempty"`
+
+		// // The behavior when clicking on a result
+		Links *[]interface{} `json:"links,omitempty"`
+
+		// Convert input values into a display string
+		Mappings *[]ValueMapping `json:"mappings,omitempty"`
+		Max      *float32        `json:"max,omitempty"`
+		Min      *float32        `json:"min,omitempty"`
+
+		// Alternative to empty string
+		NoValue *string `json:"noValue,omitempty"`
+
+		// An explict path to the field in the datasource.  When the frame meta includes a path,
+		// This will default to `${frame.meta.path}/${field.name}
+		//
+		// When defined, this value can be used as an identifier within the datasource scope, and
+		// may be used to update the results
+		Path       *string           `json:"path,omitempty"`
+		Thresholds *ThresholdsConfig `json:"thresholds,omitempty"`
+
+		// Numeric Options
+		Unit *string `json:"unit,omitempty"`
+
+		// True if data source can write a value to the path.  Auth/authz are supported separately
+		Writeable *bool `json:"writeable,omitempty"`
+	} `json:"defaults"`
+	Overrides []struct {
+		Matcher struct {
+			Id      string       `json:"id"`
+			Options *interface{} `json:"options,omitempty"`
+		} `json:"matcher"`
+		Properties []struct {
+			Id    string       `json:"id"`
+			Value *interface{} `json:"value,omitempty"`
+		} `json:"properties"`
+	} `json:"overrides"`
+}
 
 // DashboardGraphPanel defines model for dashboard.GraphPanel.
 //
@@ -411,6 +586,21 @@ type HeatmapPanel struct {
 // Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
 type HeatmapPanelType string
 
+// TODO docs
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type MappingType string
+
+// DashboardMatcherConfig defines model for dashboard.MatcherConfig.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type MatcherConfig struct {
+	Id      string       `json:"id"`
+	Options *interface{} `json:"options,omitempty"`
+}
+
 // Dashboard panels. Panels are canonically defined inline
 // because they share a version timeline with the dashboard
 // schema; they do not evolve independently.
@@ -455,17 +645,9 @@ type Panel struct {
 			Links *[]interface{} `json:"links,omitempty"`
 
 			// Convert input values into a display string
-			//
-			// TODO this one corresponds to a complex type with
-			// generics on the typescript side. Ouch. Will
-			// either need special care, or we'll just need to
-			// accept a very loosely specified schema. It's very
-			// unlikely we'll be able to translate cue to
-			// typescript generics in the general case, though
-			// this particular one *may* be able to work.
-			Mappings *[]map[string]interface{} `json:"mappings,omitempty"`
-			Max      *float32                  `json:"max,omitempty"`
-			Min      *float32                  `json:"min,omitempty"`
+			Mappings *[]ValueMapping `json:"mappings,omitempty"`
+			Max      *float32        `json:"max,omitempty"`
+			Min      *float32        `json:"min,omitempty"`
 
 			// Alternative to empty string
 			NoValue *string `json:"noValue,omitempty"`
@@ -566,6 +748,54 @@ type Panel struct {
 // Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
 type PanelRepeatDirection string
 
+// TODO docs
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type RangeMap struct {
+	Options struct {
+		// to and from are `number | null` in current ts, really not sure what to do
+		From   int32 `json:"from"`
+		Result struct {
+			Color *string `json:"color,omitempty"`
+			Icon  *string `json:"icon,omitempty"`
+			Index *int32  `json:"index,omitempty"`
+			Text  *string `json:"text,omitempty"`
+		} `json:"result"`
+		To int32 `json:"to"`
+	} `json:"options"`
+	Type RangeMapType `json:"type"`
+}
+
+// DashboardRangeMapType defines model for DashboardRangeMap.Type.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type RangeMapType string
+
+// TODO docs
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type RegexMap struct {
+	Options struct {
+		Pattern string `json:"pattern"`
+		Result  struct {
+			Color *string `json:"color,omitempty"`
+			Icon  *string `json:"icon,omitempty"`
+			Index *int32  `json:"index,omitempty"`
+			Text  *string `json:"text,omitempty"`
+		} `json:"result"`
+	} `json:"options"`
+	Type RegexMapType `json:"type"`
+}
+
+// DashboardRegexMapType defines model for DashboardRegexMap.Type.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type RegexMapType string
+
 // Row panel
 //
 // THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
@@ -593,6 +823,35 @@ type RowPanel struct {
 // THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
 // Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
 type RowPanelType string
+
+// TODO docs
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type SpecialValueMap struct {
+	Options struct {
+		Pattern string `json:"pattern"`
+		Result  struct {
+			Color *string `json:"color,omitempty"`
+			Icon  *string `json:"icon,omitempty"`
+			Index *int32  `json:"index,omitempty"`
+			Text  *string `json:"text,omitempty"`
+		} `json:"result"`
+	} `json:"options"`
+	Type SpecialValueMapType `json:"type"`
+}
+
+// DashboardSpecialValueMapType defines model for DashboardSpecialValueMap.Type.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type SpecialValueMapType string
+
+// TODO docs
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type SpecialValueMatch string
 
 // Schema for panel targets is specified by datasource
 // plugins. We use a placeholder definition, which the Go
@@ -667,6 +926,38 @@ type ThresholdsMode string
 type Transformation struct {
 	Id      string                 `json:"id"`
 	Options map[string]interface{} `json:"options"`
+}
+
+// TODO docs
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type ValueMap struct {
+	Options map[string]interface{} `json:"options"`
+	Type    ValueMapType           `json:"type"`
+}
+
+// DashboardValueMapType defines model for DashboardValueMap.Type.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type ValueMapType string
+
+// TODO docs
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type ValueMapping interface{}
+
+// TODO docs
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type ValueMappingResult struct {
+	Color *string `json:"color,omitempty"`
+	Icon  *string `json:"icon,omitempty"`
+	Index *int32  `json:"index,omitempty"`
+	Text  *string `json:"text,omitempty"`
 }
 
 // FROM: packages/grafana-data/src/types/templateVars.ts
