@@ -18,6 +18,7 @@ import { BackendSrv as BackendService, BackendSrvRequest, config, FetchError, Fe
 import appEvents from 'app/core/app_events';
 import { getConfig } from 'app/core/config';
 import { loadUrlToken } from 'app/core/utils/urlToken';
+import { DashboardModel } from 'app/features/dashboard/state';
 import { DashboardSearchItem } from 'app/features/search/types';
 import { getGrafanaStorage } from 'app/features/storage/storage';
 import { TokenRevokedModal } from 'app/features/users/TokenRevokedModal';
@@ -448,6 +449,10 @@ export class BackendSrv implements BackendService {
       return getGrafanaStorage().getDashboard(uid);
     }
     return this.get<DashboardDTO>(`/api/dashboards/uid/${uid}`);
+  }
+
+  validateDashboard(dashboard: DashboardModel) {
+    return this.request({ method: 'POST', url: `/api/dashboards/validate`, data: { dashboard } });
   }
 
   getPublicDashboardByUid(uid: string) {

@@ -23,6 +23,12 @@ export const SaveDashboardDrawer = ({ dashboard, onDismiss, onSaveSuccess, isCop
   const isProvisioned = dashboard.meta.provisioned && !isFromStorage;
   const isNew = dashboard.version === 0 && !isFromStorage;
 
+  const dashboardValidity = useAsync(async () => {
+    const saveModel = dashboard.getSaveModelClone();
+    const validationResponse = await backendSrv.validateDashboard(saveModel);
+    return validationResponse;
+  }, [dashboard]);
+
   const previous = useAsync(async () => {
     if (isNew) {
       return undefined;
@@ -162,6 +168,7 @@ export const SaveDashboardDrawer = ({ dashboard, onDismiss, onSaveSuccess, isCop
       scrollableContent
     >
       {renderBody()}
+      {dashboardValidity ? <p>dashboard is valid</p> : <p>dashboard is not valid</p>}
     </Drawer>
   );
 };
