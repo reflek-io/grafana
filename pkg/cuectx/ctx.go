@@ -70,6 +70,7 @@ func LoadGrafanaInstancesWithThema(path string, cueFS fs.FS, lib thema.Library, 
 
 	val := lib.Context().BuildInstance(inst)
 
+	opts = append(opts, thema.SkipBuggyChecks())
 	lin, err := thema.BindLineage(val, lib, opts...)
 	if err != nil {
 		return nil, err
