@@ -1,4 +1,5 @@
 {
+  "id": 42,
   "uid": "abcxyz",
   "name": "A mixtape of dashboards for testing the Cue model",
   "interval": "30s",
