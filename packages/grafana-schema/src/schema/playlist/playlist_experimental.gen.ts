@@ -9,7 +9,6 @@
 // not exported to exclude it from grafana-schema's public API surface.
 
 enum Type {
-  DashboardById = 'dashboard_by_id',
   DashboardByTag = 'dashboard_by_tag',
   DashboardByUID = 'dashboard_by_uid',
 }

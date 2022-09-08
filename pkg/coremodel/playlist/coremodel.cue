@@ -1,15 +1,18 @@
 package playlist
 
 import (
+	"strings"
 	"github.com/grafana/thema"
 )
+
+let PlaceholderPrefix = "placeholder-cupcake-"
 
 thema.#Lineage
 name: "playlist"
 seqs: [
 	{
 		schemas: [
-			{ //0.0
+			{//0.0 - represents existing Grafana playlist type
 				// Serial database identifier of the playlist.
 				id: int64
 				// Unique playlist identifier. Generated on creation, either by the
@@ -43,13 +46,13 @@ seqs: [
 					//
 					// Deprecated.
 					title: string
-				}
-			}
+				} @cuetsy(kind="interface")
+			},
 		]
 	},
 	{
 		schemas: [
-			{ //1.0
+			{//1.0 - start of new types
 				// Unique playlist identifier. Generated on creation, either by the
 				// creator of the playlist of by the application.
 				uid: string
@@ -76,54 +79,83 @@ seqs: [
 					//  - dashboard_by_uid: The value is the UID identifier of a dashboard.
 					value: string
 				}
-			}
+			},
 		]
 
-        lens: forward: {
-            to:         seqs[1].schemas[0]
-            from:       seqs[0].schemas[0]
-            translated: to & rel
-            rel: {
-            	uid: from.uid
-            	name: from.name
-            	interval: from.interval
-            	items: [for item in from.items {
-            		if (item.type == "dashboard_by_tag" || item.type == "dashboard_by_uid") {
-            			item
-            		}
-            		if (item.type == "dashboard_by_id") {
-            			type: "dashboard_by_uid"
-            			value: "placeholder-cupcake-\(item.value)"
-            		}
-            	}]
-            }
-            lacunas: [
-            	for i, item in from.items {
-            		if (item.type == "dashboard_by_id") {
-                        thema.#Lacuna & {
+		lens: forward: {
+			to:         seqs[1].schemas[0]
+			from:       seqs[0].schemas[0]
+			translated: to & rel
+			rel: {
+				uid:      from.uid
+				name:     from.name
+				interval: from.interval
+				if (from.items != _|_) {
+					items: [ for item in from.items {
+						if (item.type == "dashboard_by_tag" || item.type == "dashboard_by_uid") {
+							type: item.type
+							value: item.value
+						}
+						if (item.type == "dashboard_by_id") {
+							type:  "dashboard_by_uid"
+							value: PlaceholderPrefix + item.value
+						}
+					}]
+				}
+			}
+			lacunas: [
+				if (from.items != _|_) {
+					for i, item in from.items {
+						if (item.type == "dashboard_by_id") {
+							thema.#Lacuna & {
 								sourceFields: [{
 									path:  "items[\(i)]"
 									value: item.value
 								}]
 								targetFields: [{
 									path:  "items[\(i)]"
-									value: "placeholder-cupcake-\(item.value)"
+									value: PlaceholderPrefix + item.value
 								}]
 								message: "input was dashboard_by_id, converted to uid with universal dashboard uid placeholder prefix"
 								type:    thema.#LacunaTypes.Placeholder
 							}
-                       }
-            	}
-            ]
-        }
-        lens: reverse: {
-            to:         seqs[0].schemas[0]
-            from:       seqs[1].schemas[0]
-            translated: to & rel
-            rel: {
-            }
-            lacunas: [
-            ]
-        }
-	}
+						}
+					}
+				},
+			]
+		}
+		lens: reverse: {
+			to:         seqs[0].schemas[0]
+			from:       seqs[1].schemas[0]
+			translated: to & rel
+			rel: {
+				id:       -1
+				uid:      from.uid
+				name:     from.name
+				interval: from.interval
+				if (from.items != _|_) {
+					items: [ for i, item in from.items {
+						[
+							if (item.type == "dashboard_by_uid" && strings.HasPrefix(item.Value, PlaceholderPrefix)) {
+								type:  "dashboard_by_id"
+								value: strings.TrimPrefix(item.value, PlaceholderPrefix)
+								title: title: "dashboard_\(i)"
+							},
+							item & { title: "dashboard_\(i)" },
+						][0]
+					}]
+				}
+			}
+			lacunas: [
+				thema.#Lacuna & {
+					targetFields: [{
+						path:  "id"
+						value: -1
+					}]
+					message: "-1 used as a placeholder value - replace with a real value!"
+					type:    thema.#LacunaTypes.Placeholder
+				},
+			]
+		}
+	},
 ]

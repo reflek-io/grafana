@@ -17,8 +17,6 @@ import (
 
 // Defines values for PlaylistItemType.
 const (
-	ItemTypeDashboardById ItemType = "dashboard_by_id"
-
 	ItemTypeDashboardByTag ItemType = "dashboard_by_tag"
 
 	ItemTypeDashboardByUid ItemType = "dashboard_by_uid"
@@ -26,8 +24,6 @@ const (
 
 // Defines values for PlaylistType.
 const (
-	TypeDashboardById Type = "dashboard_by_id"
-
 	TypeDashboardByTag Type = "dashboard_by_tag"
 
 	TypeDashboardByUid Type = "dashboard_by_uid"
@@ -63,8 +59,6 @@ type Item struct {
 
 	// Value depends on type and describes the playlist item.
 	//
-	//  - dashboard_by_id: The value is an internal numerical identifier set by Grafana. This
-	//  is not portable as the numerical identifier is non-deterministic between different instances. Deprecated.
 	//  - dashboard_by_tag: The value is a tag which is set on any number of dashboards. All
 	//  dashboards behind the tag will be added to the playlist.
 	//  - dashboard_by_uid: The value is the UID identifier of a dashboard.
