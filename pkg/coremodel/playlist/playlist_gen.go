@@ -15,13 +15,22 @@ import (
 	"github.com/grafana/thema"
 )
 
-// Defines values for PlaylistItemsType.
+// Defines values for PlaylistItemType.
 const (
-	ItemsTypeDashboardById ItemsType = "dashboard_by_id"
+	ItemTypeDashboardById ItemType = "dashboard_by_id"
 
-	ItemsTypeDashboardByTag ItemsType = "dashboard_by_tag"
+	ItemTypeDashboardByTag ItemType = "dashboard_by_tag"
 
-	ItemsTypeDashboardByUid ItemsType = "dashboard_by_uid"
+	ItemTypeDashboardByUid ItemType = "dashboard_by_uid"
+)
+
+// Defines values for PlaylistType.
+const (
+	TypeDashboardById Type = "dashboard_by_id"
+
+	TypeDashboardByTag Type = "dashboard_by_tag"
+
+	TypeDashboardByUid Type = "dashboard_by_uid"
 )
 
 // Playlist defines model for playlist.
@@ -34,7 +43,7 @@ type Model struct {
 	Interval string `json:"interval"`
 
 	// The ordered list of items that the playlist will iterate over.
-	Items *[]Items `json:"items,omitempty"`
+	Items *[]Item `json:"items,omitempty"`
 
 	// Name of the playlist.
 	Name string `json:"name"`
@@ -44,19 +53,18 @@ type Model struct {
 	Uid string `json:"uid"`
 }
 
-// PlaylistItems defines model for playlist.Items.
+// PlaylistItem defines model for playlist.Item.
 //
 // THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
 // Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
-type Items struct {
+type Item struct {
 	// Type of the item.
-	Type ItemsType `json:"type"`
+	Type ItemType `json:"type"`
 
 	// Value depends on type and describes the playlist item.
 	//
 	//  - dashboard_by_id: The value is an internal numerical identifier set by Grafana. This
-	//  is not portable as the numerical identifier is non-deterministic between different instances.
-	//  Deprecated.
+	//  is not portable as the numerical identifier is non-deterministic between different instances. Deprecated.
 	//  - dashboard_by_tag: The value is a tag which is set on any number of dashboards. All
 	//  dashboards behind the tag will be added to the playlist.
 	//  - dashboard_by_uid: The value is the UID identifier of a dashboard.
@@ -67,13 +75,19 @@ type Items struct {
 //
 // THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
 // Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
-type ItemsType string
+type ItemType string
+
+// PlaylistType defines model for playlist.Type.
+//
+// THIS TYPE IS INTENDED FOR INTERNAL USE BY THE GRAFANA BACKEND, AND IS SUBJECT TO BREAKING CHANGES.
+// Equivalent Go types at stable import paths are provided in https://github.com/grafana/grok.
+type Type string
 
 //go:embed coremodel.cue
 var cueFS embed.FS
 
 // codegen ensures that this is always the latest Thema schema version
-var currentVersion = thema.SV(0, 0)
+var currentVersion = thema.SV(1, 0)
 
 // Lineage returns the Thema lineage representing a Grafana playlist.
 //

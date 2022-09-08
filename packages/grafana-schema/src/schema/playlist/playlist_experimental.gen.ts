@@ -8,10 +8,16 @@
 // This model is a WIP and not yet canonical. Consequently, its members are
 // not exported to exclude it from grafana-schema's public API surface.
 
+enum Type {
+  DashboardById = 'dashboard_by_id',
+  DashboardByTag = 'dashboard_by_tag',
+  DashboardByUID = 'dashboard_by_uid',
+}
+
 interface Playlist {
   interval: string;
   items?: {
-    type: ('dashboard_by_id' | 'dashboard_by_tag' | 'dashboard_by_uid');
+    type: Type;
     value: string;
   }[];
   name: string;
