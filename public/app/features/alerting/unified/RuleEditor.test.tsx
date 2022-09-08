@@ -1,4 +1,4 @@
-import { Matcher, render, waitFor, screen } from '@testing-library/react';
+import { Matcher, render, waitFor, screen, within } from '@testing-library/react';
 import userEvent, { PointerEventsCheckLevel } from '@testing-library/user-event';
 import React from 'react';
 import { Provider } from 'react-redux';
@@ -7,6 +7,7 @@ import { selectOptionInTest } from 'test/helpers/selectOptionInTest';
 import { byLabelText, byRole, byTestId, byText } from 'testing-library-selector';
 
 import { DataSourceInstanceSettings } from '@grafana/data';
+import { selectors } from '@grafana/e2e-selectors';
 import { locationService, setDataSourceSrv } from '@grafana/runtime';
 import { contextSrv } from 'app/core/services/context_srv';
 import { DashboardSearchHit } from 'app/features/search/types';
@@ -78,6 +79,7 @@ const ui = {
     alertType: byTestId('alert-type-picker'),
     dataSource: byTestId('datasource-picker'),
     folder: byTestId('folder-picker'),
+    folderContainer: byTestId(selectors.components.FolderPicker.containerV2),
     namespace: byTestId('namespace-picker'),
     group: byTestId('group-picker'),
     annotationKey: (idx: number) => byTestId(`annotation-key-${idx}`),
@@ -412,6 +414,12 @@ describe('RuleEditor', () => {
       id: 1,
     };
 
+    const slashedFolder = {
+      title: 'Folder with /',
+      uid: 'abcde',
+      id: 2,
+    };
+
     const dataSources = {
       default: mockDataSource({
         type: 'prometheus',
@@ -457,7 +465,7 @@ describe('RuleEditor', () => {
         },
       ],
     });
-    mocks.searchFolders.mockResolvedValue([folder] as DashboardSearchHit[]);
+    mocks.searchFolders.mockResolvedValue([folder, slashedFolder] as DashboardSearchHit[]);
 
     await renderRuleEditor(uid);
     await waitFor(() => expect(mocks.searchFolders).toHaveBeenCalled());
@@ -467,10 +475,16 @@ describe('RuleEditor', () => {
     // check that it's filled in
     const nameInput = await ui.inputs.name.find();
     expect(nameInput).toHaveValue('my great new rule');
-    expect(ui.inputs.folder.get()).toHaveTextContent(new RegExp(folder.title));
+    //check that folder is in the list
+    const folderInput = await ui.inputs.folderContainer.find();
+    expect(within(folderInput).getByRole('combobox')).toHaveValue(folder.title);
     expect(ui.inputs.annotationValue(0).get()).toHaveValue('some description');
     expect(ui.inputs.annotationValue(1).get()).toHaveValue('some summary');
 
+    //check that slashed folders are not in the list
+    await userEvent.click(within(folderInput).getByRole('combobox'));
+    expect(screen.getByText(folder.title)).toBeInTheDocument();
+    expect(screen.queryByText(slashedFolder.title)).not.toBeInTheDocument();
     // add an annotation
     await clickSelectOption(ui.inputs.annotationKey(2).get(), /Add new/);
     await userEvent.type(byRole('textbox').get(ui.inputs.annotationKey(2).get()), 'custom');
